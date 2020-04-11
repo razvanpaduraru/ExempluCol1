@@ -2,10 +2,12 @@ package ro.pub.cs.systems.eim.lab03.practicaltest01;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class PracticalTest01MainActivity extends AppCompatActivity {
 
@@ -13,6 +15,7 @@ public class PracticalTest01MainActivity extends AppCompatActivity {
     private EditText textRight;
     private Button incrLeft;
     private Button incrRight;
+    private Button navigate;
 
     private IncrementLeftButtonListener incrLeftListener = new IncrementLeftButtonListener();
     private class IncrementLeftButtonListener implements View.OnClickListener{
@@ -30,6 +33,16 @@ public class PracticalTest01MainActivity extends AppCompatActivity {
         }
     }
 
+    private NavigateButtonClickListener navigateButtonClickListener = new NavigateButtonClickListener();
+    private class NavigateButtonClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            Intent intent = new Intent(getApplicationContext(), PracticalTest01SecondaryActivity.class);
+            intent.putExtra("number_of_pressings", Integer.parseInt(textLeft.getText().toString()) + Integer.parseInt(textRight.getText().toString()));
+            startActivityForResult(intent, 1);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +57,9 @@ public class PracticalTest01MainActivity extends AppCompatActivity {
         incrRight = (Button)findViewById(R.id.right_button);
         incrLeft.setOnClickListener(incrLeftListener);
         incrRight.setOnClickListener(incrRightListener);
+
+        navigate = (Button)findViewById(R.id.navigate_to_secondary_activity_button);
+        navigate.setOnClickListener(navigateButtonClickListener);
     }
 
     @Override
@@ -65,6 +81,14 @@ public class PracticalTest01MainActivity extends AppCompatActivity {
         if (savedInstanceState.containsKey("right_edit_text")) {
             EditText tr = (EditText)findViewById(R.id.right_edit_text);
             tr.setText(savedInstanceState.getString("right_edit_text"));
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == 1) {
+            Toast.makeText(getApplication(), "Aplicatie realizata cu succes apasat de " + resultCode, Toast.LENGTH_LONG).show();
         }
     }
 }
