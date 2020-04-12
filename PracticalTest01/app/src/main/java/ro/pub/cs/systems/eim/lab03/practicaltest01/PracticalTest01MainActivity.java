@@ -26,24 +26,14 @@ public class PracticalTest01MainActivity extends AppCompatActivity {
 
     private Integer serviceStatus = Constants.SERVICE_STOPPED;
 
-    private class ButtonClickListener implements View.OnClickListener {
-        private EditText textView;
-
-        ButtonClickListener(EditText textView) {
-            this.textView = textView;
-        }
-
+    private IncrementLeftButtonListener incrLeftListener = new IncrementLeftButtonListener();
+    private class IncrementLeftButtonListener implements View.OnClickListener{
         @Override
         public void onClick(View v) {
-            String text = textView.getText().toString();
-            Integer number = Integer.parseInt(text);
-            number = number + 1;
-            textView.setText(number.toString());
+            textLeft.setText(String.valueOf(Integer.parseInt(textLeft.getText().toString()) + 1));
 
             int leftNumberOfClicks = Integer.parseInt(textLeft.getText().toString());
             int rightNumberOfClicks = Integer.parseInt(textRight.getText().toString());
-
-            // ...
 
             if (leftNumberOfClicks + rightNumberOfClicks > Constants.NUMBER_OF_CLICKS_THRESHOLD
                     && serviceStatus == Constants.SERVICE_STOPPED) {
@@ -56,19 +46,23 @@ public class PracticalTest01MainActivity extends AppCompatActivity {
         }
     }
 
-    private IncrementLeftButtonListener incrLeftListener = new IncrementLeftButtonListener();
-    private class IncrementLeftButtonListener implements View.OnClickListener{
-        @Override
-        public void onClick(View v) {
-            textLeft.setText(String.valueOf(Integer.parseInt(textLeft.getText().toString()) + 1));
-        }
-    }
-
     private IncrementRightButtonListener incrRightListener = new IncrementRightButtonListener();
     private class IncrementRightButtonListener implements View.OnClickListener{
         @Override
         public void onClick(View v) {
             textRight.setText(String.valueOf(Integer.parseInt(textRight.getText().toString()) + 1));
+
+            int leftNumberOfClicks = Integer.parseInt(textLeft.getText().toString());
+            int rightNumberOfClicks = Integer.parseInt(textRight.getText().toString());
+
+            if (leftNumberOfClicks + rightNumberOfClicks > Constants.NUMBER_OF_CLICKS_THRESHOLD
+                    && serviceStatus == Constants.SERVICE_STOPPED) {
+                Intent intent = new Intent(getApplicationContext(), PracticalTest01Service.class);
+                intent.putExtra(Constants.FIRST_NUMBER, leftNumberOfClicks);
+                intent.putExtra(Constants.SECOND_NUMBER, rightNumberOfClicks);
+                getApplicationContext().startService(intent);
+                serviceStatus = Constants.SERVICE_STARTED;
+            }
         }
     }
 
@@ -113,9 +107,6 @@ public class PracticalTest01MainActivity extends AppCompatActivity {
 
         navigate = (Button)findViewById(R.id.navigate_to_secondary_activity_button);
         navigate.setOnClickListener(navigateButtonClickListener);
-
-        incrLeft.setOnClickListener(new ButtonClickListener(textLeft));
-        incrRight.setOnClickListener(new ButtonClickListener(textRight));
 
         for (int index = 0; index < Constants.actionTypes.length; index++) {
             intentFilter.addAction(Constants.actionTypes[index]);
